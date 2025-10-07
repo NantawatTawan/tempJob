@@ -1,16 +1,18 @@
-import { EducationLevel } from '@/features/education-level/schemas/education-level.schema';
-import { JobType } from '../schemas/posted-job.schema';
+import { EducationLevel } from "@/features/education-level/schemas/education-level.schema";
+import { JobType } from "../schemas/posted-job.schema";
 
 interface IJobInfoProps {
-  jobTypeTitle: JobType['title'];
+  jobTypeTitle: JobType["title"];
   minWage: number;
   maxWage: number;
   site: string;
   province: string;
   district: string;
   hireType: string;
-  educationLevel: EducationLevel['title'];
-  description: JobType['description'];
+  educationLevel: EducationLevel["title"];
+  description: JobType["description"];
+  // --- 1. เพิ่ม Prop ใหม่สำหรับใบขับขี่ ---
+  drivingLicenseRequirement?: string | null;
   siteMapUrl?: string;
   guideline?: string;
 }
@@ -24,6 +26,8 @@ const JobInfo = ({
   district,
   hireType,
   educationLevel,
+  // --- 2. รับ Prop ใหม่เข้ามาใช้งาน ---
+  drivingLicenseRequirement,
   siteMapUrl,
   guideline,
   description,
@@ -36,7 +40,9 @@ const JobInfo = ({
         </h2>
         <div className="space-y-4">
           <div>
-            <p className="text-green-600 mb-1">ตำแน่งงาน - สถานที่ปฏิบัติงาน</p>
+            <p className="text-green-600 mb-1">
+              ตำแหน่งงาน - สถานที่ปฏิบัติงาน
+            </p>
             <p className="text-green-900">
               {jobTypeTitle} - {site}
             </p>
@@ -59,6 +65,15 @@ const JobInfo = ({
             <p className="text-green-900">{educationLevel}</p>
           </div>
 
+          {/* --- 3. เพิ่มส่วนแสดงผลใบขับขี่ --- */}
+          <div>
+            <p className="text-green-600 mb-1">ใบขับขี่</p>
+            <p className="text-green-900">
+              {drivingLicenseRequirement || "ไม่ระบุ"}
+            </p>
+          </div>
+          {/* ---------------------------------- */}
+
           <div>
             <p className="text-green-600 mb-1">
               รายละเอียดงานและคุณสมบัติประจำตำแหน่ง
@@ -70,14 +85,14 @@ const JobInfo = ({
             <p className="text-green-600 mb-1">
               Location GPS สถานที่ปฏิบัติงาน
             </p>
-            <p className="text-green-900 break-words">{siteMapUrl ?? '-'}</p>
+            <p className="text-green-900 break-words">{siteMapUrl ?? "-"}</p>
           </div>
 
           <div>
             <p className="text-green-600 mb-1">
               วิธีการเดินทางไปสถานที่ปฏิบัติงาน
             </p>
-            <p className="text-green-900 break-words">{guideline ?? '-'}</p>
+            <p className="text-green-900 break-words">{guideline ?? "-"}</p>
           </div>
         </div>
       </div>

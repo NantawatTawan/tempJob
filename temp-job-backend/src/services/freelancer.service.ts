@@ -49,6 +49,7 @@ export class FreelancerService {
   }
 
   async getFreelancers() {
+    // ... (This function remains unchanged)
     const { data: freelancers, error: freelancersError } =
       await this.supabaseClient
         .from(this._FREELANCER_INFO_VIEW)
@@ -102,7 +103,7 @@ export class FreelancerService {
     const { data: freelancerInfo, error: freelancerInfoError } =
       await this.supabaseClient
         .from(this._FREELANCER_INFO_VIEW)
-        .select("*, education_level(*)")
+        .select("*, education_level(*), education_major:education_major_id(*)")
         .eq("id", freelancerId)
         .single();
 
@@ -146,6 +147,7 @@ export class FreelancerService {
 
     return {
       ...freelancerInfo,
+      education_major_title: freelancerInfo.education_major?.title,
       interesting_job_types: interestingJobTypes,
       contacted_job_types: jobContacts,
     };
@@ -154,6 +156,7 @@ export class FreelancerService {
   async getFreelancerByIds(
     freelancerIds: string[]
   ): Promise<FreelancerWithEducationLevel[]> {
+    // ... (This function remains unchanged)
     const { data: freelancerInfo, error: freelancerInfoError } =
       await this.supabaseClient
         .from(this._FREELANCER_INFO_VIEW)
@@ -210,6 +213,7 @@ export class FreelancerService {
   }
 
   async getFreelancerProfileByUserId(userId: string) {
+    // ... (This function remains unchanged)
     const { data: freelancerInfo, error } = await this.supabaseClient
       .from(this._FREELANCER_INFO_VIEW)
       .select("*")
@@ -268,6 +272,7 @@ export class FreelancerService {
     };
   }
 
+  // ... (All other functions from toggleFreelancerOpenForContactStatus onwards remain unchanged)
   async toggleFreelancerOpenForContactStatus(freelancerId: Freelancer["id"]) {
     const freelancer = await this.getFreelancerById(freelancerId);
 

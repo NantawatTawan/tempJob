@@ -1,16 +1,16 @@
-'use client';
-import FreelancerContactedJob from '@/features/freelancers/components/FreelancerContactedJob';
-import { FreelancerStars } from '@/features/freelancers/components/FreelancerStars';
-import { getFreelancerAge } from '@/features/freelancers/helpers/freelancer.helper';
-import { useFetchFreelancer } from '@/features/freelancers/hooks/queries/useFetchFreelancer';
-import { useFetchPostedJobs } from '@/features/posted-jobs/hooks/queries/useFetchPostedJobs';
-import { PostedJob } from '@/features/posted-jobs/schemas/posted-job.schema';
-import { postedJobService } from '@/features/posted-jobs/services/posted-job.service';
-import { sortByThai } from '@/lib/utils';
-import { showErrorAlert, showSuccessAlert } from '@/shared/utils/swal.utils';
-import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+"use client";
+import FreelancerContactedJob from "@/features/freelancers/components/FreelancerContactedJob";
+import { FreelancerStars } from "@/features/freelancers/components/FreelancerStars";
+import { getFreelancerAge } from "@/features/freelancers/helpers/freelancer.helper";
+import { useFetchFreelancer } from "@/features/freelancers/hooks/queries/useFetchFreelancer";
+import { useFetchPostedJobs } from "@/features/posted-jobs/hooks/queries/useFetchPostedJobs";
+import { PostedJob } from "@/features/posted-jobs/schemas/posted-job.schema";
+import { postedJobService } from "@/features/posted-jobs/services/posted-job.service";
+import { sortByThai } from "@/lib/utils";
+import { showErrorAlert, showSuccessAlert } from "@/shared/utils/swal.utils";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const FreelanceDetailPage = () => {
   const { data: postedJobs, isFetching: isFetchingPostedJobs } =
@@ -42,7 +42,7 @@ const FreelanceDetailPage = () => {
           slug as string
         );
 
-        showSuccessAlert('จ้างงานสำเร็จ');
+        showSuccessAlert("จ้างงานสำเร็จ");
 
         router.push(`/posted-jobs/${selectedPostedJob.id}`);
       } catch (error: any) {
@@ -50,7 +50,7 @@ const FreelanceDetailPage = () => {
       }
     } catch (error: any) {
       console.error(`Failed to hire freelancer >> ${error.message}`);
-      showErrorAlert('ล้มเหลวระหว่างการจ้างงาน');
+      showErrorAlert("ล้มเหลวระหว่างการจ้างงาน");
     }
   }
 
@@ -78,7 +78,7 @@ const FreelanceDetailPage = () => {
             />
             <div className="flex-1">
               <div className="flex justify-between items-start">
-                <div className='bg-white p-6 rounded-2xl'>
+                <div className="bg-white p-6 rounded-2xl">
                   <h2 className="text-xl font-semibold text-green-900">
                     {freelancer.fullname}
                   </h2>
@@ -95,6 +95,16 @@ const FreelanceDetailPage = () => {
             </div>
           </div>
         </section>
+
+        <section
+          id="introduction"
+          className="bg-white rounded-xl shadow-sm p-3 mb-2 border border-green-100"
+        >
+          <h3 className="text-lg font-semibold mb-4 text-green-900">
+            แนะนำตัว
+          </h3>
+        </section>
+
         <section
           id="personal-info"
           className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-green-100"
@@ -142,7 +152,7 @@ const FreelanceDetailPage = () => {
               <p className="font-medium text-green-900">
                 {freelancer.open_for_contact
                   ? freelancer.phone_number
-                  : 'XXX-XXX-XXXX'}
+                  : "XXX-XXX-XXXX"}
               </p>
             </div>
           </div>
@@ -169,6 +179,7 @@ const FreelanceDetailPage = () => {
             </div>
           </div>
         </section>
+
         <section
           id="qualification-info"
           className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-green-100"
@@ -177,22 +188,31 @@ const FreelanceDetailPage = () => {
             คุณสมบัติ
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-green-600">วุฒิการศึกษา</p>
                 <p className="font-medium text-green-900">
-                  {freelancer.education_level_title ?? 'ไม่มีข้อมูล'}
+                  {freelancer.education_level_title ?? "ไม่มีข้อมูล"}
                 </p>
               </div>
+
+              <div className="space-y-1">
+                <p className="text-green-600">สาขาวิชา</p>
+                <p className="font-medium text-green-900">
+                  {freelancer.education_major_title ?? "ไม่มีข้อมูล"}
+                </p>
+              </div>
+
               <div className="space-y-1">
                 <p className="text-green-600">ใบขับขี่</p>
                 <p className="font-medium text-green-900">
-                  {freelancer.driving_license || 'ไม่มี'}
+                  {freelancer.driving_license || "ไม่มี"}
                 </p>
               </div>
             </div>
           </div>
         </section>
+
         <section
           id="work-history"
           className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-green-100"
@@ -244,7 +264,7 @@ const FreelanceDetailPage = () => {
           >
             <option value="">เลือกตำแหน่งงาน</option>
             {postedJobs &&
-              sortByThai(postedJobs, 'hire_type').map((job: PostedJob) => (
+              sortByThai(postedJobs, "hire_type").map((job: PostedJob) => (
                 <option key={job.id} value={job.id}>
                   {job.job_types.title} - {job.hire_type} - {job.site}
                 </option>

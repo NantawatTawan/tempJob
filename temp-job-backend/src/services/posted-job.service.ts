@@ -1,36 +1,38 @@
-import { getLocalTimeZone, today } from '@internationalized/date';
-import { SupabaseClient, User } from '@supabase/supabase-js';
-import { supabaseServiceClient } from '../configs/db.config';
+import { getLocalTimeZone, today } from "@internationalized/date";
+import { SupabaseClient, User } from "@supabase/supabase-js";
+import { supabaseServiceClient } from "../configs/db.config";
 import {
   formatPostedJobToPostedJobWithViewsAndApplication,
   formatPostedJobToPostedJobWithViewsAndApplications,
-} from '../helpers/posted-job.helper';
-import { isNotFoundError } from '../helpers/supabase.helper';
-import { Company } from '../models/company.model';
-import { Freelancer } from '../models/freelancer.model';
+} from "../helpers/posted-job.helper";
+import { isNotFoundError } from "../helpers/supabase.helper";
+import { Company } from "../models/company.model";
+import { Freelancer } from "../models/freelancer.model";
 import {
   PostedJob,
   PostedJobWithEducationLevel,
-} from '../models/posted-job.model';
-import { freelancerService } from './freelancer.service';
+} from "../models/posted-job.model";
+import { freelancerService } from "./freelancer.service";
 
 export class PostedJobService {
-  private _JOB_TABLE = 'job';
-  private _JOB_VIEWED_TABLE = 'job_viewed';
-  private _JOB_APPLICATION_TABLE = 'job_application';
+  private _JOB_TABLE = "job";
+  private _JOB_VIEWED_TABLE = "job_viewed";
+  private _JOB_APPLICATION_TABLE = "job_application";
+  // --- เพิ่มตารางรีวิว ---
+  private _FREELANCER_REVIEW_TABLE = "freelancer_review";
 
   constructor(private readonly supabaseClient: SupabaseClient) {
-    if (!supabaseClient) throw new Error('Supabase client is required');
+    if (!supabaseClient) throw new Error("Supabase client is required");
   }
 
   private async _isFreelancerTheJobPoster(
-    jobId: PostedJob['id'],
-    freelancerId: Freelancer['id']
+    jobId: PostedJob["id"],
+    freelancerId: Freelancer["id"]
   ) {
     const { data: jobInfo, error: jobInfoError } = await this.supabaseClient
       .from(this._JOB_TABLE)
-      .select('*, company(*)')
-      .eq('id', jobId)
+      .select("*, company(*)")
+      .eq("id", jobId)
       .single();
 
     if (jobInfoError) throw new Error(jobInfoError.message);
@@ -39,7 +41,7 @@ export class PostedJobService {
       freelancerId
     );
 
-    if (!freelancerInfo) throw new Error('ไม่พบข้อมูล Freelancer');
+    if (!freelancerInfo) throw new Error("ไม่พบข้อมูล Freelancer");
 
     return jobInfo.company.user_id === freelancerInfo.user_id;
   }
@@ -47,41 +49,105 @@ export class PostedJobService {
   async getPostedJobs() {
     return await this.supabaseClient
       .from(this._JOB_TABLE)
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select("*")
+      .order("created_at", { ascending: false });
   }
 
   async getPostedJobById(
-    jobId: PostedJob['id']
+    jobId: PostedJob["id"]
   ): Promise<PostedJobWithEducationLevel | null> {
     const { data: jobInfo, error: jobInfoError } = await this.supabaseClient
       .from(this._JOB_TABLE)
-      .select('*, education_level(*)')
-      .eq('id', jobId)
+      .select("*, education_level(*)")
+      .eq("id", jobId)
       .single();
 
     if (jobInfoError) throw new Error(jobInfoError.message);
 
     return jobInfo;
   }
+  async getPostedJobsWithApplicantsAndViewsByJobId(jobId: string) {
+    const { data: postedJob, error: postedJobError } = await this.supabaseClient
+      .from(this._JOB_TABLE)
+      .select("*, job_types(*), company(*), education_level(*)")
+      .eq("id", jobId)
+      .single();
 
-  async getPostedJobByIds(jobIds: PostedJob['id'][]) {
+    if (postedJobError) throw new Error(postedJobError.message);
+
+    const { data: jobViewed, error: jobViewedError } = await this.supabaseClient
+      .from(this._JOB_VIEWED_TABLE)
+      .select("*")
+      .eq("job_id", jobId);
+
+    if (jobViewedError) throw new Error(jobViewedError.message);
+
+    const { data: jobApplications, error: jobApplicationsError } =
+      await this.supabaseClient
+        .from(this._JOB_APPLICATION_TABLE)
+        .select("*, freelancer(*)")
+        .eq("job_id", jobId);
+
+    if (jobApplicationsError) throw new Error(jobApplicationsError.message);
+
+    // --- 1. ดึงข้อมูลรีวิวทั้งหมดของงานนี้มาเก็บไว้ก่อน ---
+    const { data: reviewsInThisJob, error: reviewsError } =
+      await this.supabaseClient
+        .from(this._FREELANCER_REVIEW_TABLE)
+        .select("freelancer_id")
+        .eq("job_id", jobId);
+
+    if (reviewsError) throw new Error(reviewsError.message);
+
+    // สร้าง Set เพื่อให้ค้นหา freelancer_id ที่รีวิวแล้วได้เร็วขึ้น
+    const reviewedFreelancerIds = new Set(
+      reviewsInThisJob.map((r) => r.freelancer_id)
+    );
+
+    const freelancerIds = jobApplications.map(
+      (jobApplication) => jobApplication.freelancer_id
+    );
+
+    const freelancers = await freelancerService.getFreelancerByIds(
+      freelancerIds
+    );
+
+    // --- 2. Map ข้อมูลเพื่อเพิ่ม is_reviewed โดยเช็คจาก Set ที่เราสร้าง ---
+    const applicationsWithReviewStatus = jobApplications.map((app) => {
+      return {
+        ...app,
+        freelancer: freelancers.find(
+          (freelancer) => freelancer.id === app.freelancer_id
+        ),
+        // เช็คว่า freelancer_id ของผู้สมัครคนนี้ อยู่ใน Set ของคนที่รีวิวแล้วหรือไม่
+        is_reviewed: reviewedFreelancerIds.has(app.freelancer_id),
+      };
+    });
+
+    return formatPostedJobToPostedJobWithViewsAndApplication(
+      { ...postedJob, minimum_education_level: postedJob.education_level },
+      jobViewed,
+      applicationsWithReviewStatus
+    );
+  }
+
+  async getPostedJobByIds(jobIds: PostedJob["id"][]) {
     const { data: jobs, error: jobsError } = await this.supabaseClient
       .from(this._JOB_TABLE)
-      .select('*')
-      .in('id', jobIds);
+      .select("*")
+      .in("id", jobIds);
 
     if (jobsError) throw new Error(jobsError.message);
 
     return jobs;
   }
 
-  async getPostedJobsByCompanyId(companyId: Company['id']) {
+  async getPostedJobsByCompanyId(companyId: Company["id"]) {
     const { data: postedJobs, error: postedJobsError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
-        .select('*')
-        .eq('company_id', companyId);
+        .select("*")
+        .eq("company_id", companyId);
 
     if (postedJobsError) throw new Error(postedJobsError.message);
 
@@ -92,20 +158,20 @@ export class PostedJobService {
     const { data: postedJobs, error: postedJobsError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
-        .select('*, job_types(*)')
-        .order('created_at', { ascending: false })
-        .eq('company_id', companyId);
+        .select("*, job_types(*)")
+        .order("created_at", { ascending: false })
+        .eq("company_id", companyId);
 
     if (postedJobsError) throw new Error(postedJobsError.message);
 
     const { data: jobViewed, error: jobViewedError } = await this.supabaseClient
       .from(this._JOB_VIEWED_TABLE)
-      .select('*');
+      .select("*");
 
     if (jobViewedError) throw new Error(jobViewedError.message);
 
     const { data: jobApplications, error: jobApplicationsError } =
-      await this.supabaseClient.from(this._JOB_APPLICATION_TABLE).select('*');
+      await this.supabaseClient.from(this._JOB_APPLICATION_TABLE).select("*");
 
     if (jobApplicationsError) throw new Error(jobApplicationsError.message);
 
@@ -120,27 +186,27 @@ export class PostedJobService {
     const { data: postedJobs, error: postedJobsError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
-        .select('*, company(*), job_types(*)')
-        .order('created_at', { ascending: false });
+        .select("*, company(*), job_types(*)")
+        .order("created_at", { ascending: false });
 
     if (postedJobsError) throw new Error(postedJobsError.message);
 
     return postedJobs;
   }
 
-  async getAllPostedJobsByFreelancerId(freelancerId: Freelancer['id']) {
+  async getAllPostedJobsByFreelancerId(freelancerId: Freelancer["id"]) {
     const { data: postedJobs, error: postedJobsError } =
       await this.supabaseClient
         .from(this._JOB_APPLICATION_TABLE)
-        .select('*, job(*, job_types(*), company(*))')
-        .eq('freelancer_id', freelancerId);
+        .select("*, job(*, job_types(*), company(*))")
+        .eq("freelancer_id", freelancerId);
 
     if (postedJobsError) throw new Error(postedJobsError.message);
 
     return postedJobs;
   }
 
-  async incrementJobView(jobId: PostedJob['id'], userId: User['id']) {
+  async incrementJobView(jobId: PostedJob["id"], userId: User["id"]) {
     const { data: jobView, error: jobViewError } = await this.supabaseClient
       .from(this._JOB_VIEWED_TABLE)
       .insert({ job_id: jobId, user_id: userId })
@@ -152,60 +218,16 @@ export class PostedJobService {
     return jobView;
   }
 
-  async getPostedJobsWithApplicantsAndViewsByJobId(jobId: string) {
-    const { data: postedJob, error: postedJobError } = await this.supabaseClient
-      .from(this._JOB_TABLE)
-      .select('*, job_types(*), company(*), education_level(*)')
-      .eq('id', jobId)
-      .single();
-
-    if (postedJobError) throw new Error(postedJobError.message);
-
-    const { data: jobViewed, error: jobViewedError } = await this.supabaseClient
-      .from(this._JOB_VIEWED_TABLE)
-      .select('*')
-      .eq('job_id', jobId);
-
-    if (jobViewedError) throw new Error(jobViewedError.message);
-
-    const { data: jobApplications, error: jobApplicationsError } =
-      await this.supabaseClient
-        .from(this._JOB_APPLICATION_TABLE)
-        .select('*, freelancer(*)')
-        .eq('job_id', jobId);
-
-    if (jobApplicationsError) throw new Error(jobApplicationsError.message);
-
-    const freelancerIds = jobApplications.map(
-      (jobApplication) => jobApplication.freelancer_id
-    );
-
-    const freelancers = await freelancerService.getFreelancerByIds(
-      freelancerIds
-    );
-
-    return formatPostedJobToPostedJobWithViewsAndApplication(
-      { ...postedJob, minimum_education_level: postedJob.education_level },
-      jobViewed,
-      jobApplications.map((jobApplication) => ({
-        ...jobApplication,
-        freelancer: freelancers.find(
-          (freelancer) => freelancer.id === jobApplication.freelancer_id
-        ),
-      }))
-    );
-  }
-
   async hasFreelancerAppliedForJob(
-    jobId: PostedJob['id'],
-    freelancerId: Freelancer['id']
+    jobId: PostedJob["id"],
+    freelancerId: Freelancer["id"]
   ): Promise<boolean> {
     const { data: jobApplication, error: jobApplicationError } =
       await this.supabaseClient
         .from(this._JOB_APPLICATION_TABLE)
-        .select('*')
-        .eq('job_id', jobId)
-        .eq('freelancer_id', freelancerId)
+        .select("*")
+        .eq("job_id", jobId)
+        .eq("freelancer_id", freelancerId)
         .single();
 
     if (jobApplicationError) {
@@ -216,7 +238,7 @@ export class PostedJobService {
     return Boolean(jobApplication);
   }
 
-  async postJob(job: Omit<PostedJob, 'id' | 'created_at' | 'expired_at'>) {
+  async postJob(job: Omit<PostedJob, "id" | "created_at" | "expired_at">) {
     const { data: postedJob, error: postedJobError } = await this.supabaseClient
       .from(this._JOB_TABLE)
       .insert(job)
@@ -229,12 +251,12 @@ export class PostedJobService {
     return postedJob;
   }
 
-  async deleteJob(jobId: PostedJob['id']) {
+  async deleteJob(jobId: PostedJob["id"]) {
     const { data: deletedJob, error: deletedJobError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
         .delete()
-        .eq('id', jobId)
+        .eq("id", jobId)
         .select()
         .single();
 
@@ -243,14 +265,14 @@ export class PostedJobService {
     return deletedJob;
   }
 
-  async disableJob(jobId: PostedJob['id']) {
+  async disableJob(jobId: PostedJob["id"]) {
     const { data: disabledJob, error: disableJobError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
         .update({
           expired_at: today(getLocalTimeZone()).toString(),
         })
-        .eq('id', jobId)
+        .eq("id", jobId)
         .select()
         .single();
 
@@ -259,14 +281,14 @@ export class PostedJobService {
     return disabledJob;
   }
 
-  async activateJob(jobId: PostedJob['id']) {
+  async activateJob(jobId: PostedJob["id"]) {
     const { data: activatedJob, error: activateJobError } =
       await this.supabaseClient
         .from(this._JOB_TABLE)
         .update({
           expired_at: today(getLocalTimeZone()).add({ days: 30 }).toString(),
         })
-        .eq('id', jobId)
+        .eq("id", jobId)
         .select()
         .single();
 
@@ -282,7 +304,7 @@ export class PostedJobService {
         .update({
           created_at: new Date().toISOString(),
         })
-        .eq('company_id', companyId)
+        .eq("company_id", companyId)
         .select()
         .returns<PostedJob[]>();
 
@@ -292,8 +314,8 @@ export class PostedJobService {
   }
 
   async applyJobForFreelancer(
-    jobId: PostedJob['id'],
-    freelancerId: Freelancer['id']
+    jobId: PostedJob["id"],
+    freelancerId: Freelancer["id"]
   ) {
     const isFreelancerTheJobPoster = await this._isFreelancerTheJobPoster(
       jobId,
@@ -301,7 +323,7 @@ export class PostedJobService {
     );
 
     if (isFreelancerTheJobPoster)
-      throw new Error('คุณไม่สามารถสมัครงานของตัวเองได้');
+      throw new Error("คุณไม่สามารถสมัครงานของตัวเองได้");
 
     const { data: appliedJob, error: appliedJobError } =
       await this.supabaseClient
@@ -315,7 +337,7 @@ export class PostedJobService {
     return appliedJob;
   }
 
-  async hireFreelancer(jobId: PostedJob['id'], freelancerId: Freelancer['id']) {
+  async hireFreelancer(jobId: PostedJob["id"], freelancerId: Freelancer["id"]) {
     const { data: hiredFreelancer, error: hiredFreelancerError } =
       await this.supabaseClient
         .from(this._JOB_APPLICATION_TABLE)
@@ -329,15 +351,15 @@ export class PostedJobService {
   }
 
   async deleteJobApplicationForFreelancer(
-    jobId: PostedJob['id'],
-    freelancerId: Freelancer['id']
+    jobId: PostedJob["id"],
+    freelancerId: Freelancer["id"]
   ) {
     const { data: deletedJobApplication, error: deletedJobApplicationError } =
       await this.supabaseClient
         .from(this._JOB_APPLICATION_TABLE)
         .delete()
-        .eq('job_id', jobId)
-        .eq('freelancer_id', freelancerId)
+        .eq("job_id", jobId)
+        .eq("freelancer_id", freelancerId)
         .select()
         .single();
 

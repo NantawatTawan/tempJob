@@ -49,6 +49,7 @@ export const PostedJobSchema = z.object({
   expired_at: z.string({ message: "กรุณากรอกวันที่หมดอายุ" }),
   minimum_education_level_id: EducationLevelSchema.shape.id,
   job_types: JobTypeSchema,
+  driving_license_requirement: z.string().optional().nullable(),
 });
 
 export const JobViewedSchema = z.object({
@@ -61,6 +62,8 @@ export const JobApplicationSchema = z.object({
   job_id: z.string(),
   freelancer_id: z.string(),
   created_at: z.string(),
+  status: z.string(),
+  is_reviewed: z.boolean(),
   freelancer: FreelancerInfoSchema,
 });
 

@@ -1,17 +1,17 @@
-'use client';
-import { useFetchEducationLevelById } from '@/features/education-level/hooks/queries/useFetchEducationLevelById';
-import JobApplicants from '@/features/posted-jobs/components/JobApplicants';
-import JobInfo from '@/features/posted-jobs/components/JobInfo';
+"use client";
+import { useFetchEducationLevelById } from "@/features/education-level/hooks/queries/useFetchEducationLevelById";
+import JobApplicants from "@/features/posted-jobs/components/JobApplicants";
+import JobInfo from "@/features/posted-jobs/components/JobInfo";
 import {
   getJobApplicationsCount,
   getJobStatusMessage,
   getJobViewsCount,
-} from '@/features/posted-jobs/helpers/posted-job.helper';
-import { useFetchJobTypeById } from '@/features/posted-jobs/hooks/queries/useFetchJobTypeById';
-import { useFetchPostedJobById } from '@/features/posted-jobs/hooks/queries/useFetchPostedJobById';
-import { postedJobService } from '@/features/posted-jobs/services/posted-job.service';
-import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
+} from "@/features/posted-jobs/helpers/posted-job.helper";
+import { useFetchJobTypeById } from "@/features/posted-jobs/hooks/queries/useFetchJobTypeById";
+import { useFetchPostedJobById } from "@/features/posted-jobs/hooks/queries/useFetchPostedJobById";
+import { postedJobService } from "@/features/posted-jobs/services/posted-job.service";
+import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 const PostedJobDetailPage = () => {
   const { slug: jobId } = useParams();
@@ -61,11 +61,11 @@ const PostedJobDetailPage = () => {
           <div className="flex items-center gap-2">
             <i className="fa-regular fa-clock"></i>
             <span>
-              หมดอายุ{' '}
-              {new Date(jobInfo.expired_at).toLocaleDateString('th-TH', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
+              หมดอายุ{" "}
+              {new Date(jobInfo.expired_at).toLocaleDateString("th-TH", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
               })}
             </span>
           </div>
@@ -80,10 +80,11 @@ const PostedJobDetailPage = () => {
           province={jobInfo.province}
           district={jobInfo.district}
           hireType={jobInfo.hire_type}
-          educationLevel={educationLevel?.title ?? 'ไม่มีข้อมูล'}
+          educationLevel={educationLevel?.title ?? "ไม่มีข้อมูล"}
           description={jobInfo.description}
           siteMapUrl={jobInfo.site_map_url ?? undefined}
           guideline={jobInfo.site_transportation_guide ?? undefined}
+          drivingLicenseRequirement={jobInfo.driving_license_requirement}
         />
         <JobApplicants applicants={jobInfo.applications ?? []} />
       </div>

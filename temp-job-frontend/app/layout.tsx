@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Temp Job",
+  title: "tempjob",
   description: "ระบบค้นหาผู้สมัครงานที่ต้องการจัดงาน",
+  icons: {
+    icon: "/tjLogo.png",
+  },
 };
 
 export default function RootLayout({

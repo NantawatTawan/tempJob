@@ -1,14 +1,14 @@
-import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import { freelancerService } from '../services/freelancer.service';
+import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { freelancerService } from "../services/freelancer.service";
 import {
   FreelancerSchema,
   ReviewFreelancerParamSchema,
-} from '../models/freelancer.model';
-import { getZodErrorMessage } from '../helpers/zod.helper';
-import { postedJobService } from '../services/posted-job.service';
-import { withCatch } from '../helpers/helper';
-import companyService from '../services/company.service';
+} from "../models/freelancer.model";
+import { getZodErrorMessage } from "../helpers/zod.helper";
+import { postedJobService } from "../services/posted-job.service";
+import { withCatch } from "../helpers/helper";
+import companyService from "../services/company.service";
 
 export async function createFreelancer(req: Request, res: Response) {
   try {
@@ -17,7 +17,7 @@ export async function createFreelancer(req: Request, res: Response) {
     if (!userId) {
       res.status(StatusCodes.BAD_REQUEST).json({
         data: null,
-        message: 'กรุณาส่งข้อมูล user_id ให้ครบ',
+        message: "กรุณาส่งข้อมูล user_id ให้ครบ",
       });
       return;
     }
@@ -28,7 +28,7 @@ export async function createFreelancer(req: Request, res: Response) {
 
     res.status(StatusCodes.CREATED).json({
       data: freelancer,
-      message: 'สร้าง freelancer สำเร็จ',
+      message: "สร้าง freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -36,7 +36,7 @@ export async function createFreelancer(req: Request, res: Response) {
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถสร้าง freelancer ได้',
+      message: "ไม่สามารถสร้าง freelancer ได้",
     });
   }
 }
@@ -51,7 +51,7 @@ export async function getFreelancers(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       data: freelancers,
-      message: 'ดึงข้อมูล freelancer สำเร็จ',
+      message: "ดึงข้อมูล freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -59,7 +59,7 @@ export async function getFreelancers(req: Request, res: Response) {
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถดึงข้อมูล freelancer ได้',
+      message: "ไม่สามารถดึงข้อมูล freelancer ได้",
     });
   }
 }
@@ -73,7 +73,7 @@ export async function getFreelancerById(req: Request, res: Response) {
     if (!freelancer) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูล freelancer',
+        message: "ไม่พบข้อมูล freelancer",
       });
       return;
     }
@@ -82,7 +82,7 @@ export async function getFreelancerById(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       data: freelancer,
-      message: 'ดึงข้อมูล freelancer สำเร็จ',
+      message: "ดึงข้อมูล freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -90,7 +90,7 @@ export async function getFreelancerById(req: Request, res: Response) {
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถดึงข้อมูล freelancer ได้',
+      message: "ไม่สามารถดึงข้อมูล freelancer ได้",
     });
   }
 }
@@ -109,7 +109,7 @@ export async function getFreelancerProfileByUserId(
     if (!freelancer) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูล freelancer',
+        message: "ไม่พบข้อมูล freelancer",
       });
       return;
     }
@@ -118,7 +118,7 @@ export async function getFreelancerProfileByUserId(
 
     res.status(StatusCodes.OK).json({
       data: freelancer,
-      message: 'ดึงข้อมูล freelancer สำเร็จ',
+      message: "ดึงข้อมูล freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -126,7 +126,7 @@ export async function getFreelancerProfileByUserId(
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถดึงข้อมูล freelancer ได้',
+      message: "ไม่สามารถดึงข้อมูล freelancer ได้",
     });
   }
 }
@@ -147,7 +147,7 @@ export async function toggleFreelancerOpenForContactStatus(
 
     res.status(StatusCodes.OK).json({
       data: freelancer,
-      message: 'ปิดเปิดสถานะฟรีแลนเซอร์สำเร็จ',
+      message: "ปิดเปิดสถานะฟรีแลนเซอร์สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -155,7 +155,7 @@ export async function toggleFreelancerOpenForContactStatus(
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถปิดเปิดสถานะฟรีแลนเซอร์ได้',
+      message: "ไม่สามารถปิดเปิดสถานะฟรีแลนเซอร์ได้",
     });
   }
 }
@@ -169,7 +169,7 @@ export async function updateFreelancerInfo(req: Request, res: Response) {
     if (!freelancerInfo) {
       res.status(StatusCodes.BAD_REQUEST).json({
         data: null,
-        message: 'กรุณาส่งข้อมูลฟรีแลนเซอร์ให้ครบ',
+        message: "กรุณาส่งข้อมูลฟรีแลนเซอร์ให้ครบ",
       });
       return;
     }
@@ -201,7 +201,7 @@ export async function updateFreelancerInfo(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       data: updatedFreelancer,
-      message: 'อัพเดตข้อมูลฟรีแลนเซอร์สำเร็จ',
+      message: "อัพเดตข้อมูลฟรีแลนเซอร์สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -209,7 +209,7 @@ export async function updateFreelancerInfo(req: Request, res: Response) {
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถอัพเดตข้อมูลฟรีแลนเซอร์ได้',
+      message: "ไม่สามารถอัพเดตข้อมูลฟรีแลนเซอร์ได้",
     });
   }
 }
@@ -227,7 +227,7 @@ export async function applyThemeForFreelancer(req: Request, res: Response) {
     if (!freelancerInfo) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูลฟรีแลนเซอร์',
+        message: "ไม่พบข้อมูลฟรีแลนเซอร์",
       });
       return;
     }
@@ -235,7 +235,7 @@ export async function applyThemeForFreelancer(req: Request, res: Response) {
     if (freelancerInfo.user_id !== user.sub) {
       res.status(StatusCodes.FORBIDDEN).json({
         data: null,
-        message: 'คุณไม่มีสิทธิในการใช้ธีมแทนผู้ใช้ดังกล่าว',
+        message: "คุณไม่มีสิทธิในการใช้ธีมแทนผู้ใช้ดังกล่าว",
       });
       return;
     }
@@ -247,13 +247,13 @@ export async function applyThemeForFreelancer(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       data: null,
-      message: 'ใช้ธีมสำเร็จ',
+      message: "ใช้ธีมสำเร็จ",
     });
   } catch (error: any) {
     console.error(`[ERROR] : ไม่สามารถใช้ธีมได้ -> ${error.message}`);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถใช้ธีมได้',
+      message: "ไม่สามารถใช้ธีมได้",
     });
   }
 }
@@ -273,7 +273,7 @@ export async function reviewFreelancer(req: Request, res: Response) {
     if (!freelancerInfo) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูลฟรีแลนเซอร์',
+        message: "ไม่พบข้อมูลฟรีแลนเซอร์",
       });
       return;
     }
@@ -281,7 +281,7 @@ export async function reviewFreelancer(req: Request, res: Response) {
     if (user.sub === freelancerInfo.user_id) {
       res.status(StatusCodes.FORBIDDEN).json({
         data: null,
-        message: 'คุณไม่สามารถรีวิวตัวเองได้',
+        message: "คุณไม่สามารถรีวิวตัวเองได้",
       });
       return;
     }
@@ -291,7 +291,7 @@ export async function reviewFreelancer(req: Request, res: Response) {
     if (!jobInfo) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูลงาน',
+        message: "ไม่พบข้อมูลงาน",
       });
       return;
     }
@@ -305,7 +305,7 @@ export async function reviewFreelancer(req: Request, res: Response) {
     if (hasAlreadyBeenReviewed) {
       res.status(StatusCodes.FORBIDDEN).json({
         data: null,
-        message: 'คุณได้รีวิวฟรีแลนเซอร์ไปแล้ว',
+        message: "คุณได้รีวิวคนนี้ไปแล้ว",
       });
       return;
     }
@@ -337,13 +337,13 @@ export async function reviewFreelancer(req: Request, res: Response) {
 
     res.status(StatusCodes.CREATED).json({
       data: null,
-      message: 'รีวิวฟรีแลนเซอร์สำเร็จ',
+      message: "รีวิวฟรีแลนเซอร์สำเร็จ",
     });
   } catch (error: any) {
     console.error(`[ERROR] : ไม่สามารถรีวิวฟรีแลนเซอร์ได้ -> ${error.message}`);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถรีวิวฟรีแลนเซอร์ได้',
+      message: "ไม่สามารถรีวิวฟรีแลนเซอร์ได้",
     });
   }
 }
@@ -358,7 +358,7 @@ export async function getFreelancerAppliedJobs(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       data: appliedJobs,
-      message: 'ดึงงานที่ฟรีแลนเซอร์ได้รับจ้างสำเร็จ',
+      message: "ดึงงานที่ฟรีแลนเซอร์ได้รับจ้างสำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -366,7 +366,7 @@ export async function getFreelancerAppliedJobs(req: Request, res: Response) {
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถดึงงานที่ฟรีแลนเซอร์ได้',
+      message: "ไม่สามารถดึงงานที่ฟรีแลนเซอร์ได้",
     });
   }
 }
@@ -387,7 +387,7 @@ export async function removeFreelancerInterestingJobType(
     if (!freelancerInfo) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูลฟรีแลนเซอร์',
+        message: "ไม่พบข้อมูลฟรีแลนเซอร์",
       });
       return;
     }
@@ -395,7 +395,7 @@ export async function removeFreelancerInterestingJobType(
     if (freelancerInfo.user_id !== user.sub) {
       res.status(StatusCodes.FORBIDDEN).json({
         data: null,
-        message: 'คุณไม่มีสิทธิในการลบงานที่สนใจ',
+        message: "คุณไม่มีสิทธิในการลบงานที่สนใจ",
       });
       return;
     }
@@ -407,7 +407,7 @@ export async function removeFreelancerInterestingJobType(
 
     res.status(StatusCodes.OK).json({
       data: null,
-      message: 'ลบงานที่สนใจของ freelancer สำเร็จ',
+      message: "ลบงานที่สนใจของ freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -415,7 +415,7 @@ export async function removeFreelancerInterestingJobType(
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถลบงานที่สนใจของ freelancer ได้',
+      message: "ไม่สามารถลบงานที่สนใจของ freelancer ได้",
     });
   }
 }
@@ -436,7 +436,7 @@ export async function addFreelancerInterestingJobType(
     if (!freelancerInfo) {
       res.status(StatusCodes.NOT_FOUND).json({
         data: null,
-        message: 'ไม่พบข้อมูลฟรีแลนเซอร์',
+        message: "ไม่พบข้อมูลฟรีแลนเซอร์",
       });
       return;
     }
@@ -444,7 +444,7 @@ export async function addFreelancerInterestingJobType(
     if (freelancerInfo.user_id !== user.sub) {
       res.status(StatusCodes.FORBIDDEN).json({
         data: null,
-        message: 'คุณไม่มีสิทธิในการเพิ่มงานที่สนใจ',
+        message: "คุณไม่มีสิทธิในการเพิ่มงานที่สนใจ",
       });
       return;
     }
@@ -467,7 +467,7 @@ export async function addFreelancerInterestingJobType(
 
     res.status(StatusCodes.CREATED).json({
       data: null,
-      message: 'เพิ่มงานที่สนใจของ freelancer สำเร็จ',
+      message: "เพิ่มงานที่สนใจของ freelancer สำเร็จ",
     });
   } catch (error: any) {
     console.error(
@@ -475,7 +475,7 @@ export async function addFreelancerInterestingJobType(
     );
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       data: null,
-      message: 'ไม่สามารถเพิ่มงานที่สนใจของ freelancer ได้',
+      message: "ไม่สามารถเพิ่มงานที่สนใจของ freelancer ได้",
     });
   }
 }
