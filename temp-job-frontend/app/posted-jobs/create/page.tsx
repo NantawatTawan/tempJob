@@ -1,7 +1,6 @@
 "use client";
 import { useFetchAllEducationLevels } from "@/features/education-level/hooks/queries/useFetchAllEducationLevels";
 import { useFetchPackageById } from "@/features/packages/hooks/queries/useFetchPackageById";
-// --- 1. Import ตัวเลือกใบขับขี่เข้ามา ---
 import {
   HIRE_TYP_OPTIONS,
   DRIVING_LICENSE_OPTIONS,

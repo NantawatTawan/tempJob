@@ -8,6 +8,7 @@ export function useFetchCompanyByUserId({ id }: Pick<User, "id">) {
     queryFn: async () => {
       return await companyService.getCompanyByUserId(id);
     },
+    enabled: !!id,
     retry: false,
   });
 }

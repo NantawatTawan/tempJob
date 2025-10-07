@@ -11,7 +11,6 @@ interface IJobInfoProps {
   hireType: string;
   educationLevel: EducationLevel["title"];
   description: JobType["description"];
-  // --- 1. เพิ่ม Prop ใหม่สำหรับใบขับขี่ ---
   drivingLicenseRequirement?: string | null;
   siteMapUrl?: string;
   guideline?: string;
@@ -65,14 +64,12 @@ const JobInfo = ({
             <p className="text-green-900">{educationLevel}</p>
           </div>
 
-          {/* --- 3. เพิ่มส่วนแสดงผลใบขับขี่ --- */}
           <div>
             <p className="text-green-600 mb-1">ใบขับขี่</p>
             <p className="text-green-900">
               {drivingLicenseRequirement || "ไม่ระบุ"}
             </p>
           </div>
-          {/* ---------------------------------- */}
 
           <div>
             <p className="text-green-600 mb-1">
