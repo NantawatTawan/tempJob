@@ -1,0 +1,60 @@
+# --- Secrets & Keys ---
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.crt
+*.cer
+*.csr
+*.der
+*.pfx
+*.jks
+*.keystore
+
+# GCP / Cloud keys
+**/.gcp/*
+**/*service-account*.json
+**/*credentials*.json
+**/*-key.json
+**/*-apikey*.json
+
+# Supabase/Firebase
+supabase/.env
+**/firebase-*.json
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Node/Next.js
+node_modules/
+.npm/
+.pnpm-store/
+dist/
+build/
+.next/
+out/
+.next-cache/
+.turbo/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Typescript
+*.tsbuildinfo
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# Misc
+.tmp/
+temp/
+.cache/

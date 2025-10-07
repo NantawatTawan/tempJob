@@ -1,0 +1,3 @@
+export enum PAYMENT_ACTIONS {
+  TOP_UP_COINS = "TOP_UP_COINS",
+}
