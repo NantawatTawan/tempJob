@@ -3,6 +3,7 @@ import {
   FreelancerContactedJobType,
   FreelancerInfo,
 } from "../schemas/freelancer.schema";
+import { DRIVING_LICENSE_OPTIONS } from "@/features/posted-jobs/constants/posted-jobs.constant";
 
 function parseAgeRange(ageRange: string): [number | null, number | null] {
   if (ageRange === "") return [null, null];
@@ -102,9 +103,22 @@ export function filterFreelancers(
       freelancerAge: getFreelancerAge(freelancer),
     });
 
-    const matchedDrivingLicense =
-      filters.drivingLicense === "" ||
-      filters.drivingLicense === freelancer.driving_license;
+    const matchedDrivingLicense = (() => {
+      if (!filters.drivingLicense) {
+        return true;
+      }
+
+      const selectedOption = DRIVING_LICENSE_OPTIONS.find(
+        (option) => option.value === filters.drivingLicense
+      );
+      if (!selectedOption) {
+        return false;
+      }
+
+      return (
+        freelancer.driving_license?.includes(selectedOption.label) ?? false
+      );
+    })();
 
     const matchedEducationLevel =
       (filters.educationLevel?.power ?? 0) <=

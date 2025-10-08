@@ -6,6 +6,8 @@ import FreelancerList from "@/features/freelancers/components/FreelancerList";
 import { filterFreelancers } from "@/features/freelancers/helpers/freelancer.helper";
 import { useFetchFreelancers } from "@/features/freelancers/hooks/queries/useFetchFreelancers";
 import { FreelancerContactedJobType } from "@/features/freelancers/schemas/freelancer.schema";
+// --- 1. Import ตัวเลือกใบขับขี่เข้ามา ---
+import { DRIVING_LICENSE_OPTIONS } from "@/features/posted-jobs/constants/posted-jobs.constant";
 import { useFetchAllJobTypes } from "@/features/posted-jobs/hooks/queries/useFetchAllJobTypes";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useProvinces } from "@/shared/hooks/useProvinces";
@@ -32,7 +34,9 @@ const FindFreelancerPage = () => {
   const [selectedEducation, setSelectedEducation] =
     useState<EducationLevel | null>(null);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [drivingLicense, setDrivingLicense] = useState("");
+  // --- 2. เปลี่ยนชื่อ state เพื่อความชัดเจน ---
+  const [selectedDrivingLicense, setSelectedDrivingLicense] = useState("");
+
   const { provinces, amphures } = useProvinces(
     selectedProvince,
     selectedDistrict
@@ -56,7 +60,8 @@ const FindFreelancerPage = () => {
     ageRange: selectedAgeRange,
     educationLevel: selectedEducation,
     gender: selectedGender,
-    drivingLicense: drivingLicense,
+    // --- 3. ส่ง state ตัวใหม่เข้าไปใน filter ---
+    drivingLicense: selectedDrivingLicense,
   });
 
   return (
@@ -223,18 +228,35 @@ const FindFreelancerPage = () => {
                       </select>
                     </div>
 
+                    {/* ============================================= */}
+                    {/* === 4. เปลี่ยนจาก input เป็น select (Dropdown) === */}
+                    {/* ============================================= */}
                     <div className="space-y-2">
                       <label className="text-sm text-gray-600 flex items-center gap-1">
                         <Car className="h-4 w-4 text-gray-400" />
                         ใบขับขี่
                       </label>
-                      <input
-                        value={drivingLicense}
-                        placeholder="ระบุหมายเลขที่ขับขี่"
-                        onChange={(e) => setDrivingLicense(e.target.value)}
+                      <select
+                        value={selectedDrivingLicense}
+                        onChange={(e) =>
+                          setSelectedDrivingLicense(e.target.value)
+                        }
                         className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm cursor-pointer"
-                      />
+                      >
+                        <option value="">ไม่จำกัด</option>
+                        {/* ดึงตัวเลือกมาจาก Constant ที่เราเคยสร้างไว้ */}
+                        {DRIVING_LICENSE_OPTIONS.map(
+                          (option) =>
+                            // ไม่เอาตัวเลือก "ไม่จำเป็นต้องมี" มาแสดงใน filter
+                            option.value !== "ไม่จำเป็นต้องมี" && (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            )
+                        )}
+                      </select>
                     </div>
+                    {/* ============================================= */}
 
                     <div className="space-y-2">
                       <label className="text-sm text-gray-600 flex items-center gap-1">
@@ -272,7 +294,7 @@ const FindFreelancerPage = () => {
             <div className="max-w-5xl mx-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium text-gray-800">
-                  ผลการค้นหา{"   "}
+                  ผลการค้นหา{"  "}
                   <span className="text-gray-500 text-sm">
                     พบ {filteredFreelancers?.length} ใบสมัคร
                   </span>

@@ -11,11 +11,11 @@ export const HIRE_TYP_OPTIONS = [
   { value: "อื่นๆ", label: "อื่นๆ" },
 ];
 export const DRIVING_LICENSE_OPTIONS = [
-  { value: "not_required", label: "ไม่จำเป็นต้องมี" },
+  { value: "not_required", label: "ไม่มี" },
 
   // ส่วนบุคคล
-  { value: "motorcycle", label: "รถจักรยานยนต์ (ส่วนบุคคล)" },
-  { value: "car_private", label: "รถยนต์ส่วนบุคคล" },
+  { value: "motorcycle", label: "รถจักรยานยนต์" },
+  { value: "car_private", label: "รถยนต์" },
 
   // สาธารณะ/พาณิชย์
   { value: "car_public", label: "รถยนต์สาธารณะ / แท็กซี่" },
@@ -25,13 +25,4 @@ export const DRIVING_LICENSE_OPTIONS = [
 
   // เฉพาะกิจ
   { value: "tractor", label: "รถแทรกเตอร์ / งานเกษตร" },
-
-  // ทางเลือกกว้าง (ถ้าตำแหน่งยอมรับหลายแบบ)
-  {
-    value: "motorcycle_or_car",
-    label: "รถจักรยานยนต์หรือรถยนต์ (อย่างใดอย่างหนึ่ง)",
-  },
-  { value: "motorcycle_and_car", label: "รถจักรยานยนต์และรถยนต์ (ทั้งสองแบบ)" },
-
-  { value: "other", label: "อื่น ๆ (ระบุในรายละเอียดงาน)" },
 ];

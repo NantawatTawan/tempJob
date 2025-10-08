@@ -16,6 +16,7 @@ import freelancerRouter from "./routes/freelancer.route";
 import bookmarkedJobRouter from "./routes/bookmarked-job.route";
 import paymentRouter from "./routes/payment.route";
 import contactRoutes from "./routes/contact.route";
+const port = process.env.PORT || 8003;
 
 const app = express();
 app.use(bodyParser.json());
@@ -38,5 +39,6 @@ app.use("/freelancer", freelancerRouter);
 app.use("/bookmarked-jobs", bookmarkedJobRouter);
 app.use("/payment", paymentRouter);
 app.use("/api/contact", contactRoutes);
-
-export default app;
+app.listen(port, () => {
+  console.log(`[INFO] : เซิร์ฟเวอร์ทำงานที่พอร์ต : ${port}`);
+});

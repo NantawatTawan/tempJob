@@ -98,11 +98,15 @@ const FreelanceDetailPage = () => {
 
         <section
           id="introduction"
-          className="bg-white rounded-xl shadow-sm p-3 mb-2 border border-green-100"
+          className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-green-100"
         >
           <h3 className="text-lg font-semibold mb-4 text-green-900">
             แนะนำตัว
           </h3>
+          {/* เพิ่ม <p> tag เพื่อแสดงข้อความ */}
+          <p className="text-gray-700 whitespace-pre-line">
+            {freelancer.introduction || "ยังไม่มีข้อมูลแนะนำตัว"}
+          </p>
         </section>
 
         <section
